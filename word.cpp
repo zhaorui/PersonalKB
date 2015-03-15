@@ -85,26 +85,49 @@ int fix_tags(std::string &s)
 
 std::istream& operator>> (std::istream& in, Word& word)
 {
+    int i = 0;
     std::string tmp;
+
+    //Input the name of the word
     std::cout << "word: ";
     std::getline(in, word.m_word);
 
+    //Input explanation of the word
     std::cout << "explain:"<<std::endl;
-    while (getline(in, tmp), !in.eof())
+    do
     {
-        tmp.append("\n");
+        putchar('>');
         word.m_explain += tmp;
     }
-
+    while (getline(in, tmp), !in.eof());
     in.clear();
+    std::cout << std::endl;
 
+    //Input samples for the word
     std::cout << "samples:"<<std::endl;
-    while (getline(in, tmp), !in.eof())
+    do
     {
+        printf("%d.  ", ++i);
         word.m_samples.push_back(tmp);
     }
-    
+    while (getline(in, tmp), !in.eof());
     in.clear();
+    std::cout << std::endl;
+
+    return in;
+}
+
+std::ostream& operator<< (std::ostream& out, const Word& word)
+{
+    int i = 0;
+    out << "word: " << word.m_word << std::endl << std::endl;
+    out << "explain:" << std::endl << word.m_explain << std::endl << std::endl;;
+    out << "samples:" << std::endl; 
+    for(auto it = word.m_samples.begin(); it != word.m_samples.end(); it++ )
+    {
+        out << ++i << ". " << *it << std::endl;
+    }
+    return out;
 }
 
 
@@ -118,6 +141,18 @@ WordBook::WordBook(std::string name)
 void WordBook::addWord(const Word& word)
 {
     m_words.push_back(word);
+}
+
+bool WordBook::isWordExist(const std::string& word)
+{
+    for (auto it = m_words.begin(); it != m_words.end(); it++)
+    {
+       if (it->m_word == word)
+       {
+            return true;
+       }
+    }
+    return false;
 }
 
 void WordBook::load()
@@ -189,8 +224,6 @@ int WordBook::format()
     }
     while (getline(infile,line))
     {
-        struct tag_locate *p = NULL;
-        struct tag_format *f = NULL;
         fix_tags(line);
         lines.push_back(line);
     }

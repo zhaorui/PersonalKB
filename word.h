@@ -8,6 +8,7 @@ class Word;
 class WordBook;
 
 std::istream& operator>> (std::istream&, Word&);
+std::ostream& operator<< (std::ostream&, const Word&);
 
 struct Word
 {
@@ -18,17 +19,18 @@ struct Word
 
 class WordBook
 {
-    std::list<Word> m_words;
-    std::string filename;
-
 public:
     WordBook(std::string file);
     void addWord(const Word&);
+    bool isWordExist(const std::string&);
     void load();
     void load(const std::string &filename);
     void save();
     void save(const std::string &filename);
     int  format();
+
+    std::list<Word> m_words;
+    std::string filename;
 };
 
 #endif
