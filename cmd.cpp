@@ -6,54 +6,9 @@
 #include <string>
 #include <cstdlib>
 #include <stdexcept>
-#include <boost/property_tree/exceptions.hpp>
+#include <string.h>
 
-const char *file = "dict.xml";
-static WordBook book(file);
-
-static int setup (void)
-{
-
-    try
-    {
-        book.load();
-    }
-    catch (boost::property_tree::ptree_bad_path &e)
-    {
-        std::cout << "ptree_bad_path" << e.what() << std::endl;
-    }
-    catch (boost::property_tree::ptree_bad_data &e)
-    {
-        std::cout << "ptree_bad_data" << e.what() << std::endl;
-    }
-    catch (boost::property_tree::ptree_error &e)
-    {
-        std::cout << "ptree_error" << e.what() << std::endl;
-    }
-    catch (std::exception &e)
-    {
-        std::cout<< "std::exception " << e.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cout << "other exception" << std::endl;
-    }
-
-    return 0;
-}
-
-static int save (void)
-{
-    try
-    {
-        book.save();
-        book.format();
-    }
-    catch (std::exception &e)
-    {
-        std::cout << "Error: " << e.what() << "\n";
-    }
-}
+extern WordBook book;
 
 int cmd_add(int argc, const char** argv, const char* prefix)
 {
@@ -80,9 +35,6 @@ int cmd_add(int argc, const char** argv, const char* prefix)
     strncpy(file_samp, word.c_str(), word.length());
     strncpy(file_ex+word.length(), ".ex.XXXXXX", 10);
     strncpy(file_samp+word.length(), ".sa.XXXXXX", 10);
-
-
-    setup();
 
     std::list<Word>::iterator it;
     for (it = book.m_words.begin(); it != book.m_words.end(); it++)
@@ -164,14 +116,11 @@ int cmd_add(int argc, const char** argv, const char* prefix)
         book.addWord(w);
     }
 
-    save();
-
     return 0;
 }
 
 int cmd_list(int argc, const char** argv, const char* prefix)
 {
-    setup();
     std::list<Word>::iterator it;
     for (it = book.m_words.begin(); it != book.m_words.end(); it++)
     {
@@ -193,8 +142,6 @@ int cmd_search(int argc, const char** argv, const char* prefix)
         word = argv[1];
     }
     
-    setup();
-
     for (auto it = book.m_words.begin(); it != book.m_words.end(); it++)
     {
         if (it->m_word == word)
@@ -220,15 +167,12 @@ int cmd_rm(int argc, const char** argv, const char* prefix)
         word = argv[1];
     }
 
-    setup();
-
     std::list<Word>::iterator it;
     for (it = book.m_words.begin(); it != book.m_words.end(); it++)
     {
         if (it->m_word == word)
         {
             book.m_words.erase(it);
-            save();
             std::cout << "erased successfully" << std::endl;
             return 0;
         }
